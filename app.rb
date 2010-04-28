@@ -6,10 +6,10 @@ require 'ftools'
 require '.bundle/environment'
 Bundler.require
 
-%w(helpers stream article haml-filter).each{|r| require "#{__DIR__}/lib/#{r}" }
+%w(helpers article haml-filter).each{|r| require "#{__DIR__}/lib/#{r}" }
 Article.path = "#{__DIR__}/articles"
 
-module Germanforblack
+module Feed
   class Application < Sinatra::Base
     set :logging, true
     set :public, File.join(File.dirname(__FILE__), 'public')
@@ -27,41 +27,24 @@ module Germanforblack
     end
       
     get '/' do
-      @image = Smoke[:flickr].output.sort_by{rand}.first
-      @links = Smoke[:delicious].output
-      @projects = Smoke[:github].output
-      @articles = Article.all.sort[0..1]
-      @event = Smoke[:upcoming].output.first
-      
+      @articles = Article.all.sort
+      haml :index, {:layout => :layout}
+    end
+    
+    get '/articles' do
+      @articles = Article.all.sort
       haml :index, {:layout => :layout}
     end
     
     get '/articles/:id' do
       @article = Article[params[:id]] || raise(Sinatra::NotFound)
-      @event = Smoke[:upcoming].output.first
       haml :article, {:layout => :inner_layout}
-    end
-
-    get '/articles' do
-      @articles = Article.all.sort
-      @event = Smoke[:upcoming].output.first
-      haml :articles
     end
 
     get '/articles.atom' do
       @articles = Article.all.sort
       content_type 'application/atom+xml'
       haml :feed, {:format => :xhtml, :layout => false}
-    end
-    
-    get '/about' do
-      @event = Smoke[:upcoming].output.first
-      haml :about
-    end
-
-    get '/clear-cache' do
-      Smoke::Cache.clear!
-      "Done"
     end
     
     get '/css/*' do
@@ -76,11 +59,11 @@ module Germanforblack
     end
 
     not_found do
-      haml :not_found, {:layout => :plain}
+      haml :not_found
     end
     
     error(500..599) do
-      haml :application_errors, {:layout => :plain}
+      haml :application_errors
     end
   end
 end 

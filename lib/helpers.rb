@@ -1,4 +1,4 @@
-module Germanforblack
+module Feed
   module Helpers
     def partial(template, locals={})
       haml("_#{template}".to_sym, :locals => locals, :layout => false)

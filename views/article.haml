@@ -1,11 +1,7 @@
 %header
-  %blockquote
-    %h1= "&#8220;#{@article.title}&#8221;"
-    %span.attribution
-      posted by Ben Schwarz on
-      %time{:datetime => @article.published.xmlschema}
-        = "#{@article.published.strftime('%B')} #{@article.published.strftime('%d')}"
-        %span.fakecaps= "#{ordinalize(@article.published.strftime('%d'))},"
-        = @article.published.strftime('%Y')
+  %h1= "#{@article.title}"
+  %h2.attribution= "posted by #{@article.author} on"
+  %time{:datetime => @article.published.strftime('%Y-%m-%d')}
+    = "#{@article.published.strftime('%B')} #{@article.published.strftime('%d')}"
 %section#content
   = article_html(@article)

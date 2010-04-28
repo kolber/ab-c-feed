@@ -1,20 +1,18 @@
-%header
-  %h1
-    %a{:href => "/about"} Ben Schwarz
-    is a web architect hailing from Melbourne, Australia who has a strong focus on user experience and scalable content delivery. 
-    
-%section#content
-  %section#recently
-    %h2 Recently
-    %ul.articles
-      = partial "articles", :articles => @articles
-      %li
-        %span.source
-          from
-          %a{:href => "/articles", :rel => "archives"} articles
-    %ul.images
-      = partial "images", :image => @image
-  
-  = partial "links", :links => @links
-  = partial "projects", :projects => @projects
-  = partial "presentations"
+%section#feed
+  %header
+    %h1 Articles
+    - @articles.group_by{|a| a.published.year }.each do |year, articles|
+      %time{ :datetime => articles.first.published.strftime('%Y') }
+        = year
+      %section.year
+        - articles.group_by{|a| a.published.month}.each do |month, articles|
+          %time{ :datetime => articles.first.published.strftime('%Y-%m-%d') }
+            = articles.first.published.strftime('%B')
+            - for article in articles
+              %article
+                %h1
+                  %a{:href => article_path(article)}= article.title
+                %p
+                  %em= article.author
+                %p= article.excerpt
+      %hr
